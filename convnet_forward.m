@@ -2,7 +2,7 @@ function [output, P] = convnet_forward(params, layers, data)
     l = length(layers);
     %batch_size = layers{1}.batch_size;
     assert(strcmp(layers{1}.type, 'DATA') == 1, 'first layer must be data layer');
-    output{1}.data = data;
+    output{1}.data = data;              % immagini nel batch
     output{1}.height = layers{1}.height;
     output{1}.width = layers{1}.width;
     output{1}.channel = layers{1}.channel;

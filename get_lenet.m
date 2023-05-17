@@ -4,10 +4,10 @@ function layers = get_lenet()
     layers{1}.height = 28;
     layers{1}.width = 28;
     layers{1}.channel = 1;
-    layers{1}.batch_size = 10; %100;
+    layers{1}.batch_size = 5;%100;
 
     layers{2}.type = 'CONV';
-    layers{2}.num = 20;
+    layers{2}.num = 20; %feature maps
     layers{2}.k = 5;
     layers{2}.stride = 1;
     layers{2}.pad = 0;

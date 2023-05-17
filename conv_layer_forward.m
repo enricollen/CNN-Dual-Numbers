@@ -28,12 +28,17 @@ input_n.channel = c;
 % Iterate over the each image in the batch, compute response,
 % Fill in the output datastructure with data, and the shape. 
 
-output.data = zeros(h_out*w_out*num, batch_size);
+%output.data matrice con tante colonne quanti imamigni nel batch e nelle
+%righe contiene i risultati della convoluzione tra un'immagine e tutti i
+%kernel
+output.data = zeros(h_out*w_out*num, batch_size); 
 output.height = h_out;
 output.width = w_out;
 output.channel = num;
 output.batch_size = batch_size;
 for b = 1:batch_size
+    % input_n è una struttura ausiliaria che serve in im2col_conv per poi
+    % andare a modificare output.data
     input_n.data = input.data(:, b);
     im = reshape(im2col_conv(input_n, layer, h_out, w_out), k*k*c, h_out*w_out);
     dot_product_result = im' * param.w + param.b;

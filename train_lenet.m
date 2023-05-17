@@ -12,7 +12,7 @@ fullset = false;
 xtrain = [xtrain, xvalidate];
 ytrain = [ytrain, yvalidate];
 m_train = size(xtrain, 2);
-batch_size = 10; %100;
+batch_size = 5; %100;
 
 %%Parameters initalization
 % - inv: return base_lr * (1 + gamma * iter) ^ (- power)
@@ -24,18 +24,18 @@ weight_decay = 0.0005;
 w_lr = 1;
 b_lr = 2;
 
-test_interval = 50; %500;
-display_interval =  10; %100;
-snapshot = 50; %500;
-max_iter = 300; %3000;
+test_interval = 10;%500;
+display_interval = 10; %100;
+snapshot = 500;
+max_iter = 30; %3000;
 no_epochs = 10; %100;
 
 %% Use the following to train from scratch
 params = init_convnet(layers);
 
 
-%% Load the network
-load lenet_pretrained.mat
+%% Load the network   ??????????????
+load lenet_pretrained.mat 
 
 param_winc = params;
 for l_idx = 1:length(layers)-1
@@ -50,18 +50,20 @@ ytrain = ytrain(:, new_order);
 
 curr_batch = 1;
 
-for iter = 1 : max_iter
+for iter = 1 : max_iter %???
     
-    if (curr_batch > m_train) 
+    if (curr_batch > m_train)  % eseguito solo alla fine di un'epoca e shuffla i training samples
         new_order = randperm(m_train);
         xtrain = xtrain(:, new_order);
         ytrain = ytrain(:, new_order);
         curr_batch = 1;
     end
-        
-    x_batch = xtrain(:, curr_batch:(curr_batch+batch_size-1));
+        % x_batch contiene le imm dentro il batch corrente(ad esempio 5)
+    x_batch = xtrain(:, curr_batch:(curr_batch+batch_size-1)); 
+        % la labels di y_batch corrispondono ai samples di x_batch, perchè
+        % li shuffla nello stesso modo e gli indici sono gli stessi
     y_batch = ytrain(:, curr_batch:(curr_batch+batch_size-1));
-    curr_batch = curr_batch + batch_size;
+    curr_batch = curr_batch + batch_size; %current_batch è l'indice di partenza del batch corrente
     
     [cp, param_grad] = conv_net(params, layers, x_batch, y_batch);
 

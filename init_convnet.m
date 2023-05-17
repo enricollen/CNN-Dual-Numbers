@@ -8,12 +8,16 @@ for i = 2:length(layers)
             scale = sqrt(3/(h*w*c));
             params{i-1}.w = 2*scale*rand(layers{i}.k*layers{i}.k*c/layers{i}.group, layers{i}.num) - scale;
             params{i-1}.b = zeros(1, layers{i}.num);
-            h = (h + 2*layers{i}.pad - layers{i}.k) / layers{i}.stride + 1;
+            % qui sotto sono l'altezza, larghezza e num di canali delle
+            % feature maps risultanti dopo la convoluzione
+            h = (h + 2*layers{i}.pad - layers{i}.k) / layers{i}.stride + 1; 
             w = (w + 2*layers{i}.pad - layers{i}.k) / layers{i}.stride + 1;
             c = layers{i}.num;
         case 'POOLING'
             h = (h - layers{i}.k) / layers{i}.stride + 1;
             w = (w - layers{i}.k) / layers{i}.stride + 1;
+            % params è un array di struct che contiene i pesi e i bias di
+            % un dato livello
             params{i-1}.w = [];
             params{i-1}.b = [];
         case 'IP'
