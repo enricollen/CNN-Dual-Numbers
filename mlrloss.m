@@ -40,7 +40,8 @@ P=bsxfun(@rdivide, W, sum(W));
 
 % Loss.
 % P(logical(I)) == I.*P which basically extracts out the terms we want
-nll=-full(sum(log(P(logical(I)))));
+nll=-full(sum(log(P(logical(I))))); % loss function ceh produce uno scalare,
+% "negative-log-likelihood" == cross-entropy loss function
 if prediction == 1
     [~, indices] = max(P);
     percent = sum(y-indices== 0) / length(y);    
@@ -50,19 +51,20 @@ end
 % Compute the gradients
 if (nargout >= 2)
     od = (P - I); % P-I gives exactly the error derivatives at the "output units"
+    % => explanation here: https://towardsdatascience.com/derivative-of-the-softmax-function-and-the-categorical-cross-entropy-loss-ffceefc081d1
     % after this theta' * od can be used as the backprop derivative
     % while od * X can be used as the derivative at the current layer
-    gw = od * X';
-    gw = gw(1:K-1,:); 
-    gb = sum(od, 2);
-    gb = gb(1:K-1,:);
-    g = [gw(:) ; gb(:)];
+    gw = od * X'; % ????
+    gw = gw(1:K-1,:); % leva l'ultimo gradiente perchè l'ha già calcolato a riga 53
+    gb = sum(od, 2); %somma per righe
+    gb = gb(1:K-1,:); % leva l'ultimo gradiente perchè l'ha già calcolato a riga 53
+    g = [gw(:) ; gb(:)]; % gradiente di pesi + bias del layer 9
 end
 
 % Compute the derivatives for backprop
 if (nargout >= 3)
     % use this for backprop
-    od = theta' * od(1:K-1,:);
+    od = theta' * od(1:K-1,:); % ????
 end
 
 end
