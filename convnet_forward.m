@@ -22,6 +22,7 @@ function [output, P] = convnet_forward(params, layers, data)
                 output{i} = elu_forward(output{i-1}, layers{i});
         end
     end
+    % nargout returns the number of function output arguments specified in the call to the currently executing function.
     if nargout > 1
         W = bsxfun(@plus, params{l-1}.w * output{l-1}.data, params{l-1}.b);
         W = [W; zeros(1, size(W, 2))];

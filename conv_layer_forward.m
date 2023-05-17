@@ -42,7 +42,7 @@ for b = 1:batch_size
     input_n.data = input.data(:, b);
     im = reshape(im2col_conv(input_n, layer, h_out, w_out), k*k*c, h_out*w_out);
     dot_product_result = im' * param.w + param.b;
-    output.data(:, b) = reshape(dot_product_result, [], 1);
+    output.data(:, b) = reshape(dot_product_result, [], 1); % output.data mette in una colonna tutte le convoluzioni di una immagine
 end
 
 

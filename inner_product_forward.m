@@ -6,8 +6,9 @@ n = size(param.w, 2);
 
 % Replace the following line with your implementation.
 
-
+%per ogni immagine nel batch
 for b = 1:k
+    %prodotto element wise con tutti i pesi del layer fully connected
     output.data(:, b) = input.data(:, b)' * param.w + param.b;
 end
 
