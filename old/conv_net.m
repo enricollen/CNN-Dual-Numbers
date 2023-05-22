@@ -20,7 +20,7 @@ function [cp, param_grad] = conv_net(params, layers, data, labels)
         param_grad{i-1}.b = param_grad{i-1}.b /batch_size;
     end
 
-    cp.cost = cost/batch_size;
+    cp.cost = cost/batch_size; % cost = reale corrispondente al risultato della nll
     cp.percent = percent;
 
     if nargout >= 2
