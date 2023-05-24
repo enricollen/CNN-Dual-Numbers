@@ -47,8 +47,12 @@ function [w_conv, b_conv, w_fc, b_fc] = TrainCNN(mini_batch_x,...
            y = currLabels(:, jImage);
            
            pred1 = Conv(x, w_conv, b_conv);
+           %pred1 = DualTensor(pred1, ones(size(pred1)));
            pred2 = Sigmoid(pred1);
+           %grad_pred2 = getDual(pred2);
+           %pred2 = getReal(pred2);
            %pred2 = ReLu(pred1);
+           
            pred3 = Pool2x2(pred2);
            pred4 = Flattening(pred3);
            pred5 = FC(pred4, w_fc, b_fc);
