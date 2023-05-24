@@ -47,7 +47,8 @@ function [w_conv, b_conv, w_fc, b_fc] = TrainCNN(mini_batch_x,...
            y = currLabels(:, jImage);
            
            pred1 = Conv(x, w_conv, b_conv);
-           pred2 = ReLu(pred1);
+           pred2 = Sigmoid(pred1);
+           %pred2 = ReLu(pred1);
            pred3 = Pool2x2(pred2);
            pred4 = Flattening(pred3);
            pred5 = FC(pred4, w_fc, b_fc);
@@ -59,10 +60,13 @@ function [w_conv, b_conv, w_fc, b_fc] = TrainCNN(mini_batch_x,...
                dldy, pred4, w_fc);
            [dldx_flat] = Flattening_backward(dldx_fc, pred3);
            [dldx_pool] = Pool2x2_backward(dldx_flat, pred2);
-           [dldx_relu] = ReLu_backward(dldx_pool, pred1);
-           [dldw_conv, dldb_conv] = Conv_backward(dldx_relu, x, w_conv,...
+           [dldx_sig] = Sigmoid_backward(dldx_pool, pred1);
+           %[dldx_relu] = ReLu_backward(dldx_pool, pred1);
+           %[dldw_conv, dldb_conv] = Conv_backward(dldx_relu, x, w_conv,...
+               %b_conv);
+           [dldw_conv, dldb_conv] = Conv_backward(dldx_sig, x, w_conv,...
                b_conv);
-           
+
            dLdw = dLdw + reshape(dldw, [size(dLdw, 2) size(dLdw, 1)])';
            dLdb = dLdb + transpose(dldb);
            
