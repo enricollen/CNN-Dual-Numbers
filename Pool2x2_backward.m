@@ -7,12 +7,11 @@
 %   Input:
 %       dLdy    = h/2 x w/2 x c loss derivative w.r.t output y
 %       x       = h x w x c input to the pooling layer
-%       y       = h/2 x w/2 x c output of the pooling layer
 %
 %   Output:
 %       dLdx    = zzzh x w x c loss derivative w.r.t the input x
 
-function [dLdx_rv] = Pool2x2_backward(dLdy, x, y)
+function [dLdx_rv] = Pool2x2_backward(dLdy, x)
     [height, width, c] = size(x);
     
     x_row_version = zeros(4, height/2 * width/2, c);

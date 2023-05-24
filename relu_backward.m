@@ -3,12 +3,11 @@
 %   Input:
 %       dLdy    = loss derivative w.r.t output y
 %       x       = input tensor, matrix, or vector
-%       y       = output tensor, matrix, or vector
 %
 %   Output:
 %       dLdx    = loss derivative w.r.t input x
 
-function [dLdx] = ReLu_backward(dLdy, x, y)
+function [dLdx] = ReLu_backward(dLdy, x)
     dydx = zeros(size(dLdy));
     
     dydx(x > 0) = 1;

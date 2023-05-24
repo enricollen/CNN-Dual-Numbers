@@ -7,11 +7,10 @@
 %       dLdy    = 1 x (h x w x c) loss derivative w.r.t output y to the
 %       flatten layer
 %       x       = h x w x c input to the flatten layer
-%       y       = (h x w x c) x 1 output of the flatten layer
 %
 %   Output:
 %       dLdx    = h x w x c loss derivative w.r.t input x
 
-function [dLdx] = Flattening_backward(dLdy, x, y)
+function [dLdx] = Flattening_backward(dLdy, x)
     dLdx = reshape(dLdy, size(x));
 end

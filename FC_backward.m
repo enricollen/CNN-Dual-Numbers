@@ -7,8 +7,6 @@
 %       dLdy    = 1xn loss derivative w.r.t output y
 %       x       = mx1 input to the fully connected layer
 %       w       = nxm weight matrix
-%       b       = nx1 bias
-%       y       = nx1 output
 %         
 %   Output:
 %       dLdx    = 1xm loss derivative w.r.t x, which is propogated
@@ -18,7 +16,7 @@
 %       dLdb    = 1xn loss derivative w.r.t b, which is used to update
 %                 the bias
 
-function [dLdx, dLdw, dLdb] = FC_backward(dLdy, x, w, b, y)
+function [dLdx, dLdw, dLdb] = FC_backward(dLdy, x, w)
     [n, m] = size(w);
    
     X = kron(eye(n), transpose(x)); % Block diagonal matrix of x
