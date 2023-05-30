@@ -63,3 +63,58 @@ z2 = [10 10 ; 10 10];
 z2 = DualMatrix(z2,ones(size(z2)));
 z3=z1-z2;
 disp(z3);
+
+
+% test product operation
+z1 = [1 2 ; 3 4];
+z1 = DualMatrix(z1,ones(size(z1)));
+fprintf("\nProduct operation test between DualMatrix and double\n");
+z2 = 2;
+z3=times(z1,z2);
+disp(z3);
+fprintf("\nProduct operation test between DualMatrix and Dual2\n");
+z2 = Dual2(2,2);
+z3=times(z1,z2);
+disp(z3);
+fprintf("\nProduct operation test between two DualMatrix\n");
+z2 = [2 2 ; 2 2];
+z2 = DualMatrix(z2,ones(size(z2)));
+z3=times(z1,z2);
+disp(z3);
+
+
+% test division operation
+z1 = [1 2 ; 3 4];
+z1 = DualMatrix(z1,ones(size(z1)));
+fprintf("\nDivision operation test between DualMatrix and double\n");
+z2 = 2;
+z3=rdivide(z1,z2);
+disp(z3);
+fprintf("\nDivision operation test between DualMatrix and Dual2\n");
+z2 = Dual2(2,2);
+z3=rdivide(z1,z2);
+disp(z3);
+fprintf("\nDivision operation test between two DualMatrix\n");
+z2 = [2 2 ; 2 2];
+z2 = DualMatrix(z2,ones(size(z2)));
+z3=rdivide(z1,z2);
+disp(z3);
+
+
+% test mean operation
+z1 = [1 2 ; 3 4];
+z1 = DualMatrix(z1,ones(size(z1)));
+fprintf("\nMean test of a DualMatrix\n");
+disp(mean(z1));
+
+% test var operation
+z1 = [1 2 ; 3 4];
+z1 = DualMatrix(z1,ones(size(z1)));
+fprintf("\nVar test of a DualMatrix\n");
+disp(var(z1));
+
+% test exp operation
+z1 = [1 2 ; 3 4];
+z1 = DualMatrix(z1,ones(size(z1)));
+fprintf("\nExp test of a DualMatrix\n");
+disp(exp(z1));

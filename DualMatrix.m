@@ -300,98 +300,119 @@ classdef DualMatrix
 
         
         function dMat3 = times(dMat1, dMat2) % element-wise product
+
+           if isa(dMat2, 'double') % product between DualMatrix and a double
+               real_part = getReal(dMat1) * dMat2;
+               dual_part = getDual(dMat1) * dMat2;
+               dMat3 = DualMatrix(real_part, dual_part);
+           elseif(isa(dMat2, 'Dual2'))  % product between DualMatrix and Dual2
+               real_part = getReal(dMat1) * getReal(dMat2); 
+               dual_part = getReal(dMat1) * getDual(dMat2) + getReal(dMat2) * getDual(dMat1) ;
+               dMat3 = DualMatrix(real_part, dual_part);
+           elseif isequal(size(dMat1.dMat),size(dMat2.dMat)) % product between two DualMatrix
+          
+               if size(dMat1.dMat, 2) ~= size(dMat2.dMat, 1)
+                    error('Inner matrix dimensions must agree for matrix multiplication.');
+               end
+
+               nR = size(dMat1.dMat, 1);
+               nC = size(dMat2.dMat, 2);
+               dMat3 = DualMatrix(zeros(nR, nC), zeros(nR, nC));
+
+               for r = 1:nR
+                   for c = 1:nC
+                        for k = 1:size(dMat1.dMat, 2)
+                            z1 = dMat1.dMat(r, k);
+                            z2 = dMat2.dMat(k, c);
             
-            if ( size(dMat1,2) > 1 ) % check if the first argument is not a matrix
-                error('This function is only available for column vectors');
-            end
-            dMat3 = zeros(size(dMat1,1), 1, 'like',DualArray);
-            if isscalar(dMat2)
-                if isa(dMat2,'double')
-                    for r=1:size(dMat1,1)
-                        dMat3(r).dMat = dMat1(r).dMat * dMat2; % multiplication of a Dual2 by a double
-                    end
-                else
-                    for r=1:size(dMat1,1)
-                        dMat3(r).dMat = dMat1(r).dMat * dMat2;
-                    end
-                end
-            else
-                if size(dMat1,1) ~= size(dMat2,1)
-                    error ('The two DualArray must have the same length');
-                else
-                    for r=1:size(dMat1,1)
-                        if isa(dMat2(r),'double')
-                            dMat3(r).dMat = dMat1(r).dMat * dMat2(r);
-                        else
-                            dMat3(r).dMat = dMat1(r).dMat * dMat2(r).dMat;
+                            real_part = getReal(dMat3.dMat(r, c)) + getReal(z1) * getReal(z2);
+                            dual_part = getDual(dMat3.dMat(r, c)) + getReal(z1) * getDual(z2) + getReal(z2) * getDual(z1);
+                                        
+                            dMat3.dMat(r, c) = Dual2(real_part, dual_part);
                         end
                     end
                 end
-            end
+           end
         end % mtimes
         
+
         function dMat3 = rdivide(dMat1, dMat2) % element-wise division
-            if ( size(dMat1,2) > 1 ) % check if the first argument is not a matrix
-                error('This function is only available for column vectors');
-            end
-            dMat3 = zeros(size(dMat1,1), 1, 'like',DualArray);
-            if isscalar(dMat2)
-                if isa(dMat2,'double')
-                    for r=1:size(dMat1,1)
-                        dMat3(r).dMat = dMat1(r).dMat / dMat2; % division of a Dual2 by a double
-                    end
-                else
-                    for r=1:size(dMat1,1)
-                        dMat3(r).dMat = dMat1(r).dMat / dMat2;
-                    end
-                end
-            else
-                if size(dMat1,1) ~= size(dMat2,1)
-                    error ('The two DualArray must have the same length');
-                else
-                    for r=1:size(dMat1,1)
-                        if isa(dMat2(r),'double')
-                            dMat3(r).dMat = dMat1(r).dMat / dMat2(r);
-                        else
-                            dMat3(r).dMat = dMat1(r).dMat / dMat2(r).dMat;
+           
+
+            if isa(dMat2, 'double') % division between DualMatrix and a double
+               if dMat2 == 0 
+                   error("Division by zero is not permitted")
+               end
+               real_part = getReal(dMat1) / dMat2;
+               dual_part = (getDual(dMat1) * dMat2) / dMat2^2;
+               dMat3 = DualMatrix(real_part, dual_part);
+           elseif(isa(dMat2, 'Dual2')) % division between DualMatrix and Dual2
+               if getReal(dMat2) == 0
+                   error("Division by zero is not permitted")
+               end
+               real_part = getReal(dMat1) / getReal(dMat2);
+               dual_part = (getDual(dMat1) * getReal(dMat2) - getDual(dMat2) * getReal(dMat1)) / getReal(dMat2)^2;
+               dMat3 = DualMatrix(real_part, dual_part);
+           elseif isequal(size(dMat1.dMat),size(dMat2.dMat)) % division between two DualMatrix
+          
+               if size(dMat1.dMat, 2) ~= size(dMat2.dMat, 1)
+                    error('Inner matrix dimensions must agree for matrix division.');
+               end
+
+               nR = size(dMat1.dMat, 1);
+               nC = size(dMat2.dMat, 2);
+               dMat3 = DualMatrix(zeros(nR, nC), zeros(nR, nC));
+
+               for r = 1:nR
+                   for c = 1:nC
+                        for k = 1:size(dMat1.dMat, 2)
+                            z1 = dMat1.dMat(r, k);
+                            z2 = dMat2.dMat(k, c);
+            
+                            real_part = getReal(dMat3.dMat(r, c)) + getReal(z1) / getReal(z2);
+                            dual_part = getDual(dMat3.dMat(r, c)) + (getDual(z1) * getReal(z2) - getDual(z2) * getReal(z1)) / getReal(z2)^2;
+                                       
+                            dMat3.dMat(r, c) = Dual2(real_part, dual_part);
                         end
                     end
                 end
-            end
+           end
         end % mrdivide
         
         %-END ARITHMETIC OPERATIONS ----------------------------------------
         
         %-BEGIN STATISTICAL OPERATIONS -------------------------------------
         function avg = mean(dMat)
-            if size(dMat,2) > 1
-                error('To Be Implemented!');
+               
+            sum = dMat.dMat(1,1);
+
+            nR = size(dMat.dMat, 1);
+            nC = size(dMat.dMat, 2);
+            for i = 1:nR
+                   for j = 2:nC
+                        sum = sum + dMat.dMat(i,j);
+                   end
             end
-            sum = dMat(1).dMat;
-            for i = 2:size(dMat,1)
-                sum = sum + dMat(i).dMat;
-            end
-            avg = sum/length(dMat);
+            avg = sum/(nR*nC);
         end % mean
         
         function v = var(dMat)
-            if size(dMat,2) > 1
-                error('To Be Implemented!');
-            end
+            
             avg = mean(dMat);
             slacks = dMat-avg;
-            squared_slacks = slacks*slacks;
+            squared_slacks = times(slacks, slacks);
             v = mean(squared_slacks);
         end % var
         
         
-        function exp_dMat = exp(dMat1)
-            if size(dMat1,2) > 1
-                error('To Be Implemented!');
-            end
-            exp_dMat = dMat1;
-            for i = 1:size(dMat1,1)
-                exp_dMat(i).dMat = exp(dMat1(i).dMat);                
+        function exp_dMat = exp(dMat)
+            
+            nR = size(dMat.dMat, 1);
+            nC = size(dMat.dMat, 2);
+            for i = 1:nR
+                   for j = 1:nC
+                    exp_dMat(i,j) = exp(getReal(dMat.dMat(i,j))) * (1 + getDual(dMat.dMat(i,j)));
+                   end
             end
         end % exp
         
