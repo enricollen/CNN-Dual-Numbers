@@ -1,4 +1,4 @@
-classdef DualArray
+classdef DualMatrix
     % DualArray class (Bidimensional Array of Dual2 Numbers)
     %
     %   Constructors for the DualArray class:
@@ -54,156 +54,23 @@ classdef DualArray
     properties
         dArr % A DualArray is a bidimensional array of Dual2
     end
-    methods (Hidden)
-        % ------- Redefine the zeros -------
-        function obj = zerosLike(obj,varargin)
-            if nargin == 1
-                error('Please provide the size');
-            end
-            % With 1-dim, considered a Squared Matrix
-            if nargin == 2
-                dim = varargin{1};
-                obj(dim,dim) = obj;
-                for r = 1:dim
-                    for c = 1:dim
-                        obj(r,c).dArr = Dual2(0);
-                    end
-                end
-            end
-            % With 2-dim, the user define both dimensions
-            if nargin == 3
-                nR = varargin{1};
-                nC = varargin{2};
-                obj(nR,nC) = obj;
-                for r = 1:nR
-                    for c = 1:nC
-                        obj(r,c).dArr = Dual2(0);
-                    end
-                end
-            end
-        end % END zeros
-        % ------- Redefine the ones -------
-        function obj = onesLike(obj,varargin)
-            if nargin == 1
-                error('Please provide the size');
-            end
-            % With 1-dim, considered a Squared Matrix
-            if nargin == 2
-                dim = varargin{1};
-                obj(dim,dim) = obj;
-                for r = 1:dim
-                    for c = 1:dim
-                        obj(r,c).dArr = Dual2(1);
-                    end
-                end
-            end
-            % With 2-dim, the user define both dimensions
-            if nargin == 3
-                nR = varargin{1};
-                nC = varargin{2};
-                obj(nR,nC) = obj;
-                for r = 1:nR
-                    for c = 1:nC
-                        obj(r,c).dArr = Dual2(1);
-                    end
-                end
-            end
-        end % END ones
-        % ------- Redefine the eye -------
-        function obj = eyeLike(obj,varargin)
-            if nargin == 1
-                error('Please provide the size');
-            end
-            if nargin == 2 || ( nargin == 3 && ( varargin{1} == varargin{2}) )
-                dim = varargin{1};
-                obj(dim,dim) = obj;
-                for r = 1:dim
-                    for c = 1:dim
-                        if r == c
-                            obj(r,c).dArr = Dual2(1);
-                        else
-                            obj(r,c).dArr = Dual2(0);
-                        end
-                    end
-                end
-            else
-                error('Eye requires that both dimensions are equal');
-            end
-        end % END eye
-        % ------- Redefine the rand -------
-        function obj = randLike(obj,varargin)
-            if nargin == 1
-                error('Please provide the size');
-            end
-            
-            if nargin == 2
-                dim = varargin{1};
-                obj(dim,dim) = obj;
-                for r = 1:dim
-                    for c = 1:dim
-                        obj(r,c).dArr = Dual2(rand(1,1));
-                    end
-                end
-            end
-            if nargin == 3
-                nR = varargin{1};
-                nC = varargin{2};
-                obj(nR,nC) = obj;
-                for r = 1:nR
-                    for c = 1:nC
-                        obj(r,c).dArr = Dual2(rand(1,1));
-                    end
-                end
-            end
-        end % END rand
-        % ------- Redefine the randn -------
-        function obj = randnLike(obj,varargin)
-            if nargin == 1
-                error('Please provide the size');
-            end
 
-            if nargin == 2
-                dim = varargin{1};
-                obj(dim,dim) = obj;
-                for r = 1:dim
-                    for c = 1:dim  
-                        obj(r,c).dArr = Dual2(randn(1,1));
-                    end
-                end
-            end
-            if nargin == 3
-                nR = varargin{1};
-                nC = varargin{2};
-                obj(nR,nC) = obj;
-                for r = 1:nR
-                    for c = 1:nC
-                        obj(r,c).dArr = Dual2(randn(1,1));
-                    end
-                end
-            end
-        end % END randn
-    end
-    
     methods
         % Constructor
-        function obj = DualArray(mat, mat_du)
-            % DualArray constructor for DualArray
+        function obj = DualMatrix(mat, mat_du)
+            % DualMatrix constructor for DualMatrix
             if nargin ~= 0
                 if nargin < 2
                     mat_du = zeros(size(mat));
                 end
-                if any( size(mat) ~= size(mat_du))
-                    error('The matrices for the real part and dual part must have same size');
+                if any(size(mat) ~= size(mat_du))
+                    error('The matrices for the real part and dual part must have the same size');
                 end
-                [nR,nC] = size(mat);
-                obj(nR,nC) = obj;
+                [nR, nC] = size(mat);
+                obj.dArr(nR, nC) = zeros(nR, nC);
                 for r = 1:nR
                     for c = 1:nC
-                        if isreal(mat)
-                           obj(r,c).dArr = Dual2(mat(r,c), mat_du(r,c)); 
-                        else % assuming complex
-                           obj(r,c).dArr = Dual2(real(mat(r,c)), imag(mat(r,c)));
-                        end
+                        obj.dArr(r, c) = Dual2(mat(r, c), mat_du(r, c));
                     end
                 end
             end
