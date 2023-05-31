@@ -12,5 +12,12 @@
 %       y   = nx1 output of the linear transformation
 
 function y = FC(x, w, b)
-    y = w*x + b;
+
+    %y= w*x +b;
+    
+    for nR = 1:size(w,1)
+        y(nR) = times(x, w(nR,:)') + b(nR); %to fix
+
+    end
+
 end

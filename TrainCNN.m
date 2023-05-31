@@ -48,21 +48,17 @@ function [w_conv, b_conv, w_fc, b_fc] = TrainCNN(mini_batch_x,...
            
            % FORWARD PASS
            pred1 = Conv(x, w_conv, b_conv);
-           [r,c,ch]=size(pred1);
-           for channel = 1:ch
-                z1(:,:,channel) = DualMatrix(zeros(r,c),ones(r,c));
-           end
-           for channel = 1:size(pred1,3)
-                z1(:,:,channel) = DualMatrix(pred1(:,:,channel), ones(size(pred1,1),size(pred1,2)));
-           end
+           pred1 = DualTensor(pred1, ones(size(pred1)));
            pred2 = Sigmoid(pred1);
-           %grad_pred2 = getDual(pred2);
-           %pred2 = getReal(pred2);
-           %pred2 = ReLu(pred1);
+           grad_pred2 = getDual(pred2);
+           pred2 = getReal(pred2);
            
            pred3 = Pool2x2(pred2);
            pred4 = Flattening(pred3);
-           pred5 = FC(pred4, w_fc, b_fc);
+           pred4 = DualArray(pred4, ones(size(pred4)));
+           pred5 = FC(pred4, w_fc, b_fc);               %to fix 
+           %grad_pred5 = getDual(pred5);
+           %pred5 = getReal(pred5); %pred5 must be 10x1
            
            [l, dldy] = Loss_cross_entropy_softmax(pred5, y);
            loss(iIter) = loss(iIter)+l;
