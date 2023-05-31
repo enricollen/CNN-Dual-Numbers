@@ -1,5 +1,5 @@
-classdef DualMatrix
-    % DualArray class (Bidimensional Array of Dual2 Numbers)
+classdef DualTensor
+    % DualTensor class (Bidimensional Array of Dual2 Numbers)
     %
     %   Constructors for the DualArray class:
     %
@@ -186,8 +186,8 @@ classdef DualMatrix
     
     methods
         % Constructor
-        function obj = DualMatrix(mat, mat_du)
-            % DualArray constructor for DualArray
+        function obj = DualTensor(mat, mat_du)
+            % DualTensor constructor
             if nargin ~= 0
                 if nargin < 2
                     mat_du = zeros(size(mat));
@@ -195,14 +195,15 @@ classdef DualMatrix
                 if any( size(mat) ~= size(mat_du))
                     error('The matrices for the real part and dual part must have same size');
                 end
-                [nR,nC] = size(mat);
-                obj.dMat = repmat(Dual2, nR, nC); % Preallocate dMat
-                for r = 1:nR
-                    for c = 1:nC
-                        if isreal(mat)
-                           obj.dMat(r,c) = Dual2(mat(r,c), mat_du(r,c)); 
-                        else % assuming complex
-                           obj.dMat(r,c) = Dual2(real(mat(r,c)), imag(mat(r,c)));
+                [nR,nC,channels] = size(mat);
+                %obj.dMat = repmat(Dual2, nR, nC); % Preallocate dMat
+                obj(nR,nC,channels)=obj;
+                for ch = 1:channels
+                    for r = 1:nR
+                        for c = 1:nC
+                            if isreal(mat)
+                               obj(r,c,ch).dMat = Dual2(mat(r,c,ch), mat_du(r,c,ch));
+                            end
                         end
                     end
                 end
@@ -210,15 +211,20 @@ classdef DualMatrix
         end % constructor
         
         function disp(obj)
-            [nR, nC] = size(obj.dMat);
-            for r = 1:nR
-                for c = 1:nC
-                    fprintf('(%f, %+fε)', getReal(obj.dMat(r,c)), getDual(obj.dMat(r,c)));
-                    if c ~= nC
-                        fprintf(' , ');
+            [nR, nC, channels] = size(obj);
+            for ch = 1:channels
+                fprintf('Channel [%i]\n',ch);
+                for r = 1:nR
+                    for c = 1:nC
+                        fprintf('(%f, %+fε)', getReal(obj(r,c,ch).dMat), getDual(obj(r,c,ch).dMat));
+                        if c ~= nC
+                            fprintf(' , ');
+                        end
                     end
+                    fprintf('\n');
                 end
-                fprintf('\n');
+                    fprintf('\n-----------');
+                    fprintf('\n');
             end
         end % disp
        

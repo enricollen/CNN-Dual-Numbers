@@ -46,8 +46,15 @@ function [w_conv, b_conv, w_fc, b_fc] = TrainCNN(mini_batch_x,...
            x = reshape(currBatch(:, jImage), [14 14 1]); %invece che in colonna riporta img in matrice
            y = currLabels(:, jImage);
            
+           % FORWARD PASS
            pred1 = Conv(x, w_conv, b_conv);
-           %pred1 = DualTensor(pred1, ones(size(pred1)));
+           [r,c,ch]=size(pred1);
+           for channel = 1:ch
+                z1(:,:,channel) = DualMatrix(zeros(r,c),ones(r,c));
+           end
+           for channel = 1:size(pred1,3)
+                z1(:,:,channel) = DualMatrix(pred1(:,:,channel), ones(size(pred1,1),size(pred1,2)));
+           end
            pred2 = Sigmoid(pred1);
            %grad_pred2 = getDual(pred2);
            %pred2 = getReal(pred2);
