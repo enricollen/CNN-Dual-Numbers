@@ -25,6 +25,7 @@ for iTest = 1 : size(im_test,2)
     pred3 = Pool2x2(pred2);
     pred4 = Flattening(pred3);
     pred5 = FC(pred4, w_fc, b_fc);
+    pred5 = getReal(pred5);
     y = SoftMax(pred5);
     
     [~,l] = max(y);
