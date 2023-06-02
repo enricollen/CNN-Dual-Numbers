@@ -56,19 +56,25 @@ function [w_conv, b_conv, w_fc, b_fc] = TrainCNN(mini_batch_x,...
            pred3 = Pool2x2(pred2);
            pred4 = Flattening(pred3);
            pred4 = DualArray(pred4, ones(size(pred4)));
-           pred5 = FC(pred4, w_fc, b_fc);               %to fix 
-           %grad_pred5 = getDual(pred5);
-           %pred5 = getReal(pred5); %pred5 must be 10x1
+           pred5 = FC(pred4, w_fc, b_fc);  
+           %pred5 = Sigmoid(pred5); ???
+           grad_pred5 = getDual(pred5);
+           pred5 = getReal(pred5); 
            
            [l, dldy] = Loss_cross_entropy_softmax(pred5, y);
            loss(iIter) = loss(iIter)+l;
+
+           % BACKWARD PASS
+           %[dldx_fc, dldw, dldb] = FC_backward(...
+           %    dldy, pred4, w_fc);
+           dldx_fc = (w_fc'*dldy').*grad_pred5';
+           pred4=getReal(pred4);
+           dldw = dldy' * pred4';
+           dldb = dldy;
            
-           [dldx_fc, dldw, dldb] = FC_backward(...
-               dldy, pred4, w_fc);
            [dldx_flat] = Flattening_backward(dldx_fc, pred3);
            [dldx_pool] = Pool2x2_backward(dldx_flat, pred2);
            [dldx_sig] = Sigmoid_backward(dldx_pool, pred1);
-           %[dldx_relu] = ReLu_backward(dldx_pool, pred1);
            %[dldw_conv, dldb_conv] = Conv_backward(dldx_relu, x, w_conv,...
                %b_conv);
            [dldw_conv, dldb_conv] = Conv_backward(dldx_sig, x, w_conv,...
