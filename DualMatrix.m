@@ -1,5 +1,5 @@
 classdef DualMatrix
-    % DualArray class (Bidimensional Array of Dual2 Numbers)
+    % DualMatrix class (Bidimensional Array of Dual2 Numbers)
     %
     %   Constructors for the DualArray class:
     %
@@ -52,36 +52,36 @@ classdef DualMatrix
     % See also Dual2, Dual2.setgetPrefs(...)
     
     properties
-        dMat % is a nxm matrix of Dual2
+        dArr % is a nxm matrix of Dual2
     end
     methods (Hidden)
         % ------- Redefine the zeros -------
-    function obj = zerosLike(obj,varargin)
-        if nargin == 1
-            error('Please provide the size');
-        end
-        % With 1-dim, considered a Squared Matrix
-        if nargin == 2
-            dim = varargin{1};
-            obj(dim,dim) = DualMatrix; % <-- Updated line
-            for r = 1:dim
-                for c = 1:dim
-                    obj(r,c).dMat = Dual2(0);
-                end
+        function obj = zerosLike(obj,varargin)
+            if nargin == 1
+                error('Please provide the size');
             end
-        end
-        % With 2-dim, the user define both dimensions
-        if nargin == 3
-            nR = varargin{1};
-            nC = varargin{2};
-            obj(nR,nC) = DualMatrix; % <-- Updated line
-            for r = 1:nR
-                for c = 1:nC
-                    obj(r,c).dMat = Dual2(0);
-                end
+            % With 1-dim, considered a Squared Matrix
+            if nargin == 2
+                dim = varargin{1};
+                obj(dim) = obj;
+                    for r = 1:dim
+                        for c = 1:dim
+                            obj(r,c).dArr = Dual2(0);
+                        end
+                    end
             end
-        end
-    end % END zeros
+            % With 2-dim, the user define both dimensions
+            if nargin == 3
+                nR = varargin{1};
+                nC = varargin{2};
+                obj(nR) = obj;
+                    for r = 1:nR
+                        for c = 1:nC
+                            obj(r,c).dArr = Dual2(0);
+                        end
+                    end
+            end
+        end % END zeros
     % ------- Redefine the ones -------
     function obj = onesLike(obj,varargin)
         if nargin == 1
@@ -93,7 +93,7 @@ classdef DualMatrix
             obj(dim,dim) = DualMatrix; % <-- Updated line
             for r = 1:dim
                 for c = 1:dim
-                    obj(r,c).dMat = Dual2(1);
+                    obj(r,c).dArr = Dual2(1);
                 end
             end
         end
@@ -104,7 +104,7 @@ classdef DualMatrix
             obj(nR,nC) = DualMatrix; % <-- Updated line
             for r = 1:nR
                 for c = 1:nC
-                    obj(r,c).dMat = Dual2(1);
+                    obj(r,c).dArr = Dual2(1);
                 end
             end
         end
@@ -120,9 +120,9 @@ classdef DualMatrix
                 for r = 1:dim
                     for c = 1:dim
                         if r == c
-                            obj(r,c).dMat = Dual2(1);
+                            obj(r,c).dArr = Dual2(1);
                         else
-                            obj(r,c).dMat = Dual2(0);
+                            obj(r,c).dArr = Dual2(0);
                         end
                     end
                 end
@@ -141,7 +141,7 @@ classdef DualMatrix
                 obj(dim,dim) = obj;
                 for r = 1:dim
                     for c = 1:dim
-                        obj(r,c).dMat = Dual2(rand(1,1));
+                        obj(r,c).dArr = Dual2(rand(1,1));
                     end
                 end
             end
@@ -151,7 +151,7 @@ classdef DualMatrix
                 obj(nR,nC) = obj;
                 for r = 1:nR
                     for c = 1:nC
-                        obj(r,c).dMat = Dual2(rand(1,1));
+                        obj(r,c).dArr = Dual2(rand(1,1));
                     end
                 end
             end
@@ -167,7 +167,7 @@ classdef DualMatrix
                 obj(dim,dim) = obj;
                 for r = 1:dim
                     for c = 1:dim  
-                        obj(r,c).dMat = Dual2(randn(1,1));
+                        obj(r,c).dArr = Dual2(randn(1,1));
                     end
                 end
             end
@@ -177,7 +177,7 @@ classdef DualMatrix
                 obj(nR,nC) = obj;
                 for r = 1:nR
                     for c = 1:nC
-                        obj(r,c).dMat = Dual2(randn(1,1));
+                        obj(r,c).dArr = Dual2(randn(1,1));
                     end
                 end
             end
@@ -187,7 +187,7 @@ classdef DualMatrix
     methods
         % Constructor
         function obj = DualMatrix(mat, mat_du)
-            % DualArray constructor for DualArray
+            % DualMatrix constructor
             if nargin ~= 0
                 if nargin < 2
                     mat_du = zeros(size(mat));
@@ -196,13 +196,11 @@ classdef DualMatrix
                     error('The matrices for the real part and dual part must have same size');
                 end
                 [nR,nC] = size(mat);
-                obj.dMat = repmat(Dual2, nR, nC); % Preallocate dMat
+                obj(nR,nC)=obj;
                 for r = 1:nR
                     for c = 1:nC
                         if isreal(mat)
-                           obj.dMat(r,c) = Dual2(mat(r,c), mat_du(r,c)); 
-                        else % assuming complex
-                           obj.dMat(r,c) = Dual2(real(mat(r,c)), imag(mat(r,c)));
+                           obj(r,c).dArr = Dual2(mat(r,c), mat_du(r,c));
                         end
                     end
                 end
@@ -210,49 +208,48 @@ classdef DualMatrix
         end % constructor
         
         function disp(obj)
-            [nR, nC] = size(obj.dMat);
-            for r = 1:nR
-                for c = 1:nC
-                    fprintf('(%f, %+fε)', getReal(obj.dMat(r,c)), getDual(obj.dMat(r,c)));
-                    if c ~= nC
-                        fprintf(' , ');
+            [nR, nC] = size(obj);
+                for r = 1:nR
+                    for c = 1:nC
+                        fprintf('(%f, %+fε)', getReal(obj(r,c).dArr), getDual(obj(r,c).dArr));
+                        if c ~= nC
+                            fprintf(' , ');
+                        end
                     end
+                    fprintf('\n');
                 end
-                fprintf('\n');
-            end
         end % disp
        
 
         function d2 = getAsDual2(obj, i, j) % get the Dual Number at row i and column j
-             d2 = obj.dMat(i,j);
+             d2 = obj(i,j).dArr;
         end
         
         function mat_re = getReal(obj) % get the matrix extracting real values at row i and column j only
-            mat_re = zeros(size(obj.dMat));
+            mat_re = zeros(size(obj));
             
-            for i=1:size(obj.dMat,1)
-                for j=1:size(obj.dMat,2)
-                    d2 = getAsDual2(obj,i,j);
-                    mat_re(i,j) = getReal(d2);
+                for i=1:size(obj,1)
+                    for j=1:size(obj,2)
+                        d2 = getAsDual2(obj,i,j);
+                        mat_re(i,j) = getReal(d2);
+                    end
                 end
-            end
         end
 
         function mat_du = getDual(obj) % get the matrix extracting dual values at row i and column j only
-            mat_du = zeros(size(obj.dMat));
-            
-            for i=1:size(obj.dMat,1)
-                for j=1:size(obj.dMat,2)
-                    d2 = getAsDual2(obj,i,j);
-                    mat_du(i,j) = getDual(d2);
+            mat_du = zeros(size(obj));
+
+                for i=1:size(obj,1)
+                    for j=1:size(obj,2)
+                        d2 = getAsDual2(obj,i,j);
+                        mat_du(i,j) = getDual(d2);
+                    end
                 end
-            end
         end
  
-        function abs_as_a_new_DualMatrix = abs(obj) % return a matrix where element i,j is defined as |z|=|a|+sign(a)*eps        
-           
-                    mat_re = abs(getReal(obj));
-                    mat_du = sign(getReal(obj));
+        function abs_as_a_new_DualMatrix = abs(obj) % return a tensor where element i,j is defined as |z|=|a|+sign(a)*eps                
+            mat_re = abs(getReal(obj));
+            mat_du = sign(getReal(obj));
             abs_as_a_new_DualMatrix = DualMatrix(mat_re, mat_du);
         end
         
@@ -261,121 +258,138 @@ classdef DualMatrix
         % a DualMatrix and a double/Dual2
         
         function dMat3 = plus(dMat1, dMat2) % element-wise addition
+           
+           dMat3 = zeros(size(dMat1,1), size(dMat1,2), 'like', DualMatrix);
 
            if isa(dMat2, 'double') % addition between DualMatrix and a double
-               real_part = getReal(dMat1) + dMat2;
-               dMat3 = DualMatrix(real_part, getDual(dMat1));
+               for r=1:size(dMat1,1)
+                    for c=1:size(dMat1,2)
+                        dMat3(r,c).dArr = dMat1(r,c).dArr + dMat2; % addition of a DualMatrix by a double
+                    end
+               end
            elseif(isa(dMat2, 'Dual2'))
-               real_part = getReal(dMat1) + getReal(dMat2); % addition between DualMatrix and Dual2
-               dual_part = getDual(dMat1) + getDual(dMat2);
-               dMat3 = DualMatrix(real_part, dual_part);
-           elseif isequal(size(dMat1.dMat),size(dMat2.dMat)) % addition between two DualMatrix
-               real_part = getReal(dMat1) + getReal(dMat2);
-               dual_part = getDual(dMat1) + getDual(dMat2);
-               dMat3 = DualMatrix(real_part, dual_part);
+               for r=1:size(dMat1,1)
+                    for c=1:size(dMat1,2)
+                        dMat3(r,c).dArr = dMat1(r,c).dArr + dMat2; % addition of a DualMatrix by a Dual2
+                    end
+               end
            else
-               error ('The two DualMatrix must have the same length');
+               if size(dMat1,1) ~= size(dMat2,1)
+                    error ('The two DualMatrix must have the same length');
+               else
+                    for r=1:size(dMat1,1)
+                        for c=1:size(dMat1,2)
+                            if isa(dMat2(r,c),'double')
+                                dMat3(r,c).dArr = dMat1(r,c).dArr + dMat2(r,c);
+                            else
+                                dMat3(r,c).dArr = dMat1(r,c).dArr + dMat2(r,c).dArr;
+                            end
+                        end
+                    end
+               end
            end
         end % plus
         
 
 
         function dMat3 = minus(dMat1, dMat2) % element-wise subtraction
-            if isa(dMat2, 'double') % subtraction between DualMatrix and a double
-               real_part = getReal(dMat1) - dMat2;
-               dMat3 = DualMatrix(real_part, getDual(dMat1));
+           dMat3 = zeros(size(dMat1,1), size(dMat1,2), 'like', DualMatrix);
+
+           if isa(dMat2, 'double') % addition between DualMatrix and a double
+               for r=1:size(dMat1,1)
+                    for c=1:size(dMat1,2)
+                        dMat3(r,c).dArr = dMat1(r,c).dArr - dMat2; % subtraction of a DualMatrix by a double
+                    end
+               end
            elseif(isa(dMat2, 'Dual2'))
-               real_part = getReal(dMat1) - getReal(dMat2); % subtraction between DualMatrix and Dual2
-               dual_part = getDual(dMat1) - getDual(dMat2);
-               dMat3 = DualMatrix(real_part, dual_part);
-           elseif isequal(size(dMat1.dMat),size(dMat2.dMat)) % subtraction between two DualMatrix
-               real_part = getReal(dMat1) - getReal(dMat2);
-               dual_part = getDual(dMat1) - getDual(dMat2);
-               dMat3 = DualMatrix(real_part, dual_part);
+               for r=1:size(dMat1,1)
+                    for c=1:size(dMat1,2)
+                        dMat3(r,c).dArr = dMat1(r,c).dArr - dMat2; % subtraction of a DualMatrix by a Dual2
+                    end
+               end
            else
-               error ('The two DualMatrix must have the same length');
-            end
+               if size(dMat1,1) ~= size(dMat2,1)
+                    error ('The two DualMatrix must have the same length');
+               else
+                    for r=1:size(dMat1,1)
+                        for c=1:size(dMat1,2)
+                            if isa(dMat2(r,c),'double')
+                                dMat3(r,c).dArr = dMat1(r,c).dArr - dMat2(r,c);
+                            else
+                                dMat3(r,c).dArr = dMat1(r,c).dArr - dMat2(r,c).dArr;
+                            end
+                        end
+                    end
+               end
+           end
         end % minus
 
 
         
         function dMat3 = times(dMat1, dMat2) % element-wise product
+           
+           dMat3 = zeros(size(dMat1,1), size(dMat1,2), 'like', DualMatrix);
 
            if isa(dMat2, 'double') % product between DualMatrix and a double
-               real_part = getReal(dMat1) * dMat2;
-               dual_part = getDual(dMat1) * dMat2;
-               dMat3 = DualMatrix(real_part, dual_part);
-           elseif(isa(dMat2, 'Dual2'))  % product between DualMatrix and Dual2
-               real_part = getReal(dMat1) * getReal(dMat2); 
-               dual_part = getReal(dMat1) * getDual(dMat2) + getReal(dMat2) * getDual(dMat1) ;
-               dMat3 = DualMatrix(real_part, dual_part);
-           elseif isequal(size(dMat1.dMat),size(dMat2.dMat)) % product between two DualMatrix
-          
-               if size(dMat1.dMat, 2) ~= size(dMat2.dMat, 1)
-                    error('Inner matrix dimensions must agree for matrix multiplication.');
-               end
-
-               nR = size(dMat1.dMat, 1);
-               nC = size(dMat2.dMat, 2);
-               dMat3 = DualMatrix(zeros(nR, nC), zeros(nR, nC));
-
-               for r = 1:nR
-                   for c = 1:nC
-                        for k = 1:size(dMat1.dMat, 2)
-                            z1 = dMat1.dMat(r, k);
-                            z2 = dMat2.dMat(k, c);
-            
-                            real_part = getReal(dMat3.dMat(r, c)) + getReal(z1) * getReal(z2);
-                            dual_part = getDual(dMat3.dMat(r, c)) + getReal(z1) * getDual(z2) + getReal(z2) * getDual(z1);
-                                        
-                            dMat3.dMat(r, c) = Dual2(real_part, dual_part);
+                   for r=1:size(dMat1,1)
+                        for c=1:size(dMat1,2)
+                            dMat3(r,c).dArr = dMat1(r,c).dArr * dMat2; % product of a DualMatrix by a double
+                        end
+                   end
+           elseif(isa(dMat2, 'Dual2'))
+                   for r=1:size(dMat1,1)
+                        for c=1:size(dMat1,2)
+                            dMat3(r,c).dArr = dMat1(r,c).dArr * dMat2; % product of a DualMatrix by a Dual2
+                        end
+                   end
+           else
+               if size(dMat1,1) ~= size(dMat2,1)
+                    error ('The two DualMatrix must have the same length');
+               else
+                    for r=1:size(dMat1,1)
+                        for c=1:size(dMat1,2)
+                            if isa(dMat2(r,c),'double')
+                                dMat3(r,c).dArr = dMat1(r,c).dArr * dMat2(r,c);
+                            else
+                                dMat3(r,c).dArr = dMat1(r,c).dArr * dMat2(r,c).dArr;
+                            end
                         end
                     end
-                end
+               end
            end
         end % mtimes
         
 
         function dMat3 = rdivide(dMat1, dMat2) % element-wise division
            
+            dMat3 = zeros(size(dMat1,1), size(dMat1,2), 'like', DualMatrix);
 
-            if isa(dMat2, 'double') % division between DualMatrix and a double
-               if dMat2 == 0 
-                   error("Division by zero is not permitted")
-               end
-               real_part = getReal(dMat1) / dMat2;
-               dual_part = (getDual(dMat1) * dMat2) / dMat2^2;
-               dMat3 = DualMatrix(real_part, dual_part);
-           elseif(isa(dMat2, 'Dual2')) % division between DualMatrix and Dual2
-               if getReal(dMat2) == 0
-                   error("Division by zero is not permitted")
-               end
-               real_part = getReal(dMat1) / getReal(dMat2);
-               dual_part = (getDual(dMat1) * getReal(dMat2) - getDual(dMat2) * getReal(dMat1)) / getReal(dMat2)^2;
-               dMat3 = DualMatrix(real_part, dual_part);
-           elseif isequal(size(dMat1.dMat),size(dMat2.dMat)) % division between two DualMatrix
-          
-               if size(dMat1.dMat, 2) ~= size(dMat2.dMat, 1)
-                    error('Inner matrix dimensions must agree for matrix division.');
-               end
-
-               nR = size(dMat1.dMat, 1);
-               nC = size(dMat2.dMat, 2);
-               dMat3 = DualMatrix(zeros(nR, nC), zeros(nR, nC));
-
-               for r = 1:nR
-                   for c = 1:nC
-                        for k = 1:size(dMat1.dMat, 2)
-                            z1 = dMat1.dMat(r, k);
-                            z2 = dMat2.dMat(k, c);
-            
-                            real_part = getReal(dMat3.dMat(r, c)) + getReal(z1) / getReal(z2);
-                            dual_part = getDual(dMat3.dMat(r, c)) + (getDual(z1) * getReal(z2) - getDual(z2) * getReal(z1)) / getReal(z2)^2;
-                                       
-                            dMat3.dMat(r, c) = Dual2(real_part, dual_part);
+           if isa(dMat2, 'double') % division between DualMatrix and a double
+                   for r=1:size(dMat1,1)
+                        for c=1:size(dMat1,2)
+                            dMat3(r,c).dArr = dMat1(r,c).dArr / dMat2; % division of a DualMatrix by a double
+                        end
+                   end
+           elseif(isa(dMat2, 'Dual2'))
+                   for r=1:size(dMat1,1)
+                        for c=1:size(dMat1,2)
+                            dMat3(r,c).dArr = dMat1(r,c).dArr / dMat2; % division of a DualMatrix by a Dual2
+                        end
+                   end
+           else
+               if size(dMat1,1) ~= size(dMat2,1)
+                    error ('The two DualMatrix must have the same length');
+               else
+                    for r=1:size(dMat1,1)
+                        for c=1:size(dMat1,2)
+                            if isa(dMat2(r,c),'double')
+                                dMat3(r,c).dArr = dMat1(r,c).dArr / dMat2(r,c);
+                            else
+                                dMat3(r,c).dArr = dMat1(r,c).dArr / dMat2(r,c).dArr;
+                            end
                         end
                     end
-                end
+               end
            end
         end % mrdivide
         
@@ -384,15 +398,15 @@ classdef DualMatrix
         %-BEGIN STATISTICAL OPERATIONS -------------------------------------
         function avg = mean(dMat)
                
-            sum = dMat.dMat(1,1);
+            sum = dMat(1,1).dArr;
 
-            nR = size(dMat.dMat, 1);
-            nC = size(dMat.dMat, 2);
-            for i = 1:nR
+            nR = size(dMat, 1);
+            nC = size(dMat, 2);
+                for i = 1:nR
                    for j = 2:nC
-                        sum = sum + dMat.dMat(i,j);
+                        sum = sum + dMat(i,j).dArr;
                    end
-            end
+                end
             avg = sum/(nR*nC);
         end % mean
         
@@ -407,12 +421,14 @@ classdef DualMatrix
         
         function exp_dMat = exp(dMat)
             
-            nR = size(dMat.dMat, 1);
-            nC = size(dMat.dMat, 2);
+            exp_dMat = dMat;
+
+            nR = size(dMat, 1);
+            nC = size(dMat, 2);
             for i = 1:nR
-                   for j = 1:nC
-                    exp_dMat(i,j) = exp(getReal(dMat.dMat(i,j))) * (1 + getDual(dMat.dMat(i,j)));
-                   end
+               for j = 2:nC
+                    exp_dMat(i,j) = exp(getReal(dMat(i,j).dArr)) * (1 + getDual(dMat(i,j).dArr));
+               end
             end
         end % exp
         
