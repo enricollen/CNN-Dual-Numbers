@@ -15,9 +15,11 @@ function y = FC(x, w, b)
 
     %y= w*x +b;
     
-    for nR = 1:size(w,1)
-        y(nR) = times(x, w(nR,:)') + b(nR); %to fix
-
+    [nRows, ~] = size(w);
+    y = DualArray(zeros(nRows,1),zeros(nRows,1));
+    
+    for nR = 1:nRows
+        y(nR).dArr = sum(times(x, w(nR, :)')) + b(nR);
     end
 
 end

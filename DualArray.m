@@ -415,6 +415,17 @@ classdef DualArray
                 end
             end
         end % mrdivide
+
+
+        function d = sum(dArr)
+            
+            % dArr = 147x1
+            d=Dual2(0);
+            for r=1:size(dArr,1)
+                d = d+dArr(r).dArr;
+            end
+
+        end % sum
         
         %-END ARITHMETIC OPERATIONS ----------------------------------------
         
