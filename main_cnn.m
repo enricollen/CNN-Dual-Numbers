@@ -4,14 +4,17 @@ load('mnist_train.mat');
 load('mnist_test.mat');
 
 % Data preprocessing
-batch_size = 30;
+rng(1);
+batch_size = 1;
 im_train = im_train/255;
 im_test = im_test/255;
+im_test = im_test(:, 1:10);
 [mini_batch_x, mini_batch_y] = GetMiniBatch(im_train, label_train, batch_size);
 
 % input->conv->relu->pool->flat->fc(10)->softmax->cross_entropy
 % conv filter: 3x3x1x3
-[w_conv, b_conv, w_fc, b_fc] = TrainCNN(mini_batch_x, mini_batch_y);
+load('w_conv_and_w_fc.mat');
+[w_conv, b_conv, w_fc, b_fc] = TrainCNN(mini_batch_x, mini_batch_y, w_conv, w_fc);
 
 
 % Test

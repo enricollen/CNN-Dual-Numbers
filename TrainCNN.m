@@ -17,14 +17,20 @@
 %       b_fc    = 10x1 bias for fully connected layer
 
 function [w_conv, b_conv, w_fc, b_fc] = TrainCNN(mini_batch_x,...
-    mini_batch_y)
+    mini_batch_y, w_conv, w_fc)
     nBatches = size(mini_batch_x, 1);
     gamma = 0.03;
     lambda = 1;
     
-    
-    w_conv = normrnd(0, 1, [3 3 1 3]); b_conv = zeros(3, 1);
-    w_fc = normrnd(0, 1, [10 147]); b_fc = zeros(10, 1);
+    if nargin < 3
+        w_conv = normrnd(0, 1, [3 3 1 3]); 
+    end
+    if nargin < 4
+        w_fc = normrnd(0, 1, [10 147]); 
+    end
+      
+    b_conv = zeros(3, 1);
+    b_fc = zeros(10, 1);
     [~, f, c1, c2] = size(w_conv);
     
     kBatchNo = 1;
@@ -55,22 +61,22 @@ function [w_conv, b_conv, w_fc, b_fc] = TrainCNN(mini_batch_x,...
            
            pred3 = Pool2x2(pred2);
            pred4 = Flattening(pred3);
-           pred4 = DualArray(pred4, ones(size(pred4)));
+           %pred4 = DualArray(pred4, ones(size(pred4)));
            pred5 = FC(pred4, w_fc, b_fc);  
-           %pred5 = Sigmoid(pred5); %???
-           grad_pred5 = getDual(pred5);
-           pred5 = getReal(pred5); 
+           %pred5 = Sigmoid(pred5); 
+           %grad_pred5 = getDual(pred5);
+           %pred5 = getReal(pred5); 
            
            [l, dldy] = Loss_cross_entropy_softmax(pred5, y);
            loss(iIter) = loss(iIter)+l;
 
            % BACKWARD PASS
-           %[dldx_fc, dldw, dldb] = FC_backward(...
-               %dldy, pred4, w_fc);
-           dldx_fc = (dldy * w_fc);%.*grad_pred5;
-           pred4 = getReal(pred4);
-           dldw = dldy' * pred4';
-           dldb = dldy;
+           [dldx_fc, dldw, dldb] = FC_backward(...
+               dldy, pred4, w_fc);
+           %dldx_fc = (dldy * w_fc);%.*grad_pred5;
+           %pred4 = getReal(pred4);
+           %dldw = dldy' * pred4';
+           %dldb = dldy;
            
            [dldx_flat] = Flattening_backward(dldx_fc, pred3);
            [dldx_pool] = Pool2x2_backward(dldx_flat, pred2);
@@ -87,6 +93,7 @@ function [w_conv, b_conv, w_fc, b_fc] = TrainCNN(mini_batch_x,...
         end
         
         w_conv = w_conv - gamma/currBatchSize*dLdw_conv;
+
         b_conv = b_conv - gamma/currBatchSize*dLdb_conv;
         w_fc = w_fc - gamma/currBatchSize*dLdw;
         b_fc = b_fc - gamma/currBatchSize*dLdb;
