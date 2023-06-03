@@ -20,12 +20,12 @@ confusion = zeros(10,10);
 for iTest = 1 : size(im_test,2)
     x = reshape(im_test(:,iTest), [14, 14, 1]);
     pred1 = Conv(x, w_conv, b_conv); 
+    pred1 = DualTensor(pred1, ones(size(pred1)));
     pred2 = Sigmoid(pred1);
-    %pred2 = ReLu(pred1);
+    pred2 = getReal(pred2);
     pred3 = Pool2x2(pred2);
     pred4 = Flattening(pred3);
     pred5 = FC(pred4, w_fc, b_fc);
-    pred5 = getReal(pred5);
     y = SoftMax(pred5);
     
     [~,l] = max(y);
