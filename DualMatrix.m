@@ -1,55 +1,16 @@
 classdef DualMatrix
-    % DualMatrix class (Bidimensional Array of Dual2 Numbers)
+    % DualMatrix class (Bidimensional Matrix of Dual2 Numbers)
     %
-    %   Constructors for the DualArray class:
+    %   Constructors for the DualMatrix class:
     %
-    %   DualArray(mat)  % builds a DualArray having the same number of rows
+    %   DualMatrix(mat)  % builds a DualMatrix having the same number of rows
     %                   % and columns of mat, where the element (i,j) is
     %                   % exactly the value of mat(i,j), but represented as
     %                   % a Dual2 of the predetermined degree.
     %
-    %   % EXAMPLES of usage
     %
-    %   Dual2.setgetPrefs('DISPLAY_FORMAT',0); % ASCII
-    %   disp(' ');
-    %   mat1 = [ 1 2; 4 5; 6,7]
-    %   da1  = DualArray(mat1);
-    %   disp(da1); fprintf('\n');
-    %
-    %   da2 = zeros(2, 3, 'like', DualArray); % this is a 2-by-3 matrix of Dual2 numbers,
-    %                                         % all equal to zero.
-    %   disp(da2); fprintf('\n');
-    %
-    %   da3 = eye(3, 'like', DualArray);      % this is a 3-by-3 identity matrix of Dual2
-    %   disp(da3); fprintf('\n');
-    %
-    %
-    %   da4 = randn(4, 1, 'like', DualArray); % this is a column vector of random Dual2,
-    %                                         % following a normal distribution
-    %   disp(da4); fprintf('\n');
-    %
-    %   da5 = DualArray(randn(5,1));              % this is a 5-by-1 matrix
-    %                                             % of Dual2 numbers, with
-    %                                             % real part random and dual
-    %                                             % part equals to 0
-    %                                        
-    %   disp(da5); fprintf('\n');
-    %
-    %   da6 = DualArray(randn(5,3), ones(5,3));   % this is a 5-by-3 matrix of Dual numbers 
-    %                                             % with Real part random 
-    %                                             % and Dual part equals to
-    %                                             % 1
-    %                                            
-    %   disp(da6); fprintf('\n');
-    %
-    %   co7 = complex(randn(5,3), ones(5,3));      % you can build a Dual Matrix
-    %                                              % with a Matrix of
-    %                                              % Complex numbers
-    %   da7 = DualArray(co7);                 
-    %                                         
-    %   disp(da7); fprintf('\n');    
-    %
-    % See also Dual2, Dual2.setgetPrefs(...)
+    % 
+    % 
     
     properties
         dArr % is a nxm matrix of Dual2
@@ -247,7 +208,7 @@ classdef DualMatrix
                 end
         end
  
-        function abs_as_a_new_DualMatrix = abs(obj) % return a tensor where element i,j is defined as |z|=|a|+sign(a)*eps                
+        function abs_as_a_new_DualMatrix = abs(obj) % return a matrix where element i,j is defined as |z|=|a|+sign(a)*eps                
             mat_re = abs(getReal(obj));
             mat_du = sign(getReal(obj));
             abs_as_a_new_DualMatrix = DualMatrix(mat_re, mat_du);

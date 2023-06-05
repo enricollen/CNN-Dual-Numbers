@@ -36,7 +36,7 @@ function [w_conv, b_conv, w_fc, b_fc] = TrainCNN(mini_batch_x,...
     kBatchNo = 1;
     loss = zeros(10000, 1);
     
-    for iIter = 1:10 %10000
+    for iIter = 1:1 %10000
         if mod(iIter, 1000) == 0
             gamma = lambda * gamma;
         end
@@ -49,7 +49,7 @@ function [w_conv, b_conv, w_fc, b_fc] = TrainCNN(mini_batch_x,...
         currBatchSize = size(currBatch, 2);
         
         for jImage = 1:currBatchSize
-           x = reshape(currBatch(:, jImage), [14 14 1]); %invece che in colonna riporta img in matrice
+           x = reshape(currBatch(:, jImage), [14 14 1]); 
            y = currLabels(:, jImage);
            
            % FORWARD PASS
@@ -63,7 +63,7 @@ function [w_conv, b_conv, w_fc, b_fc] = TrainCNN(mini_batch_x,...
            pred4 = Flattening(pred3);
            pred4 = DualArray(pred4, ones(size(pred4)));
            pred5 = FC(pred4, w_fc, b_fc);  
-           %pred5 = Sigmoid(pred5); 
+           pred5 = Sigmoid(pred5); 
            grad_pred5 = getDual(pred5);
            pred5 = getReal(pred5); 
            
@@ -73,7 +73,7 @@ function [w_conv, b_conv, w_fc, b_fc] = TrainCNN(mini_batch_x,...
            % BACKWARD PASS
            %[dldx_fc, dldw, dldb] = FC_backward(...
            %    dldy, pred4, w_fc);
-           dldx_fc = (dldy * w_fc)' * 1;    %grad_pred5'; %147x1 * 1x10 = 147x10
+           dldx_fc = (dldy * w_fc)' * 1;  % 1 corresponds to derivative of flatten layer 
            pred4 = getReal(pred4); 
            dldw = dldy' * pred4';
            dldb = dldy;
@@ -103,8 +103,8 @@ function [w_conv, b_conv, w_fc, b_fc] = TrainCNN(mini_batch_x,...
         end
     end
     
-    f = figure(2);
-    f.Name = 'CNN';
-    f.NumberTitle = 'off';
-    plot([1:10000], loss);
+    %f = figure(2);
+    %f.Name = 'CNN';
+    %f.NumberTitle = 'off';
+    %plot([1:10000], loss);
 end

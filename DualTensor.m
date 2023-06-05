@@ -1,55 +1,15 @@
 classdef DualTensor
-    % DualTensor class (Bidimensional Array of Dual2 Numbers)
+    % DualTensor class (Multidimensional Matrix of Dual2 Numbers)
     %
-    %   Constructors for the DualArray class:
+    %   Constructors for the DualTensor class:
     %
-    %   DualArray(mat)  % builds a DualArray having the same number of rows
-    %                   % and columns of mat, where the element (i,j) is
-    %                   % exactly the value of mat(i,j), but represented as
+    %   DualTensor(mat)  % builds a DualTensor having the same number of rows
+    %                   % and columns of mat, where the element (i,j,k) is
+    %                   % exactly the value of mat(i,j,k), but represented as
     %                   % a Dual2 of the predetermined degree.
     %
-    %   % EXAMPLES of usage
-    %
-    %   Dual2.setgetPrefs('DISPLAY_FORMAT',0); % ASCII
-    %   disp(' ');
-    %   mat1 = [ 1 2; 4 5; 6,7]
-    %   da1  = DualArray(mat1);
-    %   disp(da1); fprintf('\n');
-    %
-    %   da2 = zeros(2, 3, 'like', DualArray); % this is a 2-by-3 matrix of Dual2 numbers,
-    %                                         % all equal to zero.
-    %   disp(da2); fprintf('\n');
-    %
-    %   da3 = eye(3, 'like', DualArray);      % this is a 3-by-3 identity matrix of Dual2
-    %   disp(da3); fprintf('\n');
-    %
-    %
-    %   da4 = randn(4, 1, 'like', DualArray); % this is a column vector of random Dual2,
-    %                                         % following a normal distribution
-    %   disp(da4); fprintf('\n');
-    %
-    %   da5 = DualArray(randn(5,1));              % this is a 5-by-1 matrix
-    %                                             % of Dual2 numbers, with
-    %                                             % real part random and dual
-    %                                             % part equals to 0
-    %                                        
-    %   disp(da5); fprintf('\n');
-    %
-    %   da6 = DualArray(randn(5,3), ones(5,3));   % this is a 5-by-3 matrix of Dual numbers 
-    %                                             % with Real part random 
-    %                                             % and Dual part equals to
-    %                                             % 1
-    %                                            
-    %   disp(da6); fprintf('\n');
-    %
-    %   co7 = complex(randn(5,3), ones(5,3));      % you can build a Dual Matrix
-    %                                              % with a Matrix of
-    %                                              % Complex numbers
-    %   da7 = DualArray(co7);                 
-    %                                         
-    %   disp(da7); fprintf('\n');    
-    %
-    % See also Dual2, Dual2.setgetPrefs(...)
+    % 
+    %    
     
     properties
         dArr % is a nxm matrix of Dual2
@@ -95,7 +55,7 @@ classdef DualTensor
         % With 1-dim, considered a Squared Matrix
         if nargin == 2
             dim = varargin{1};
-            obj(dim,dim) = DualMatrix; % <-- Updated line
+            obj(dim,dim) = DualMatrix; 
             for r = 1:dim
                 for c = 1:dim
                     obj(r,c).dArr = Dual2(1);
@@ -106,7 +66,7 @@ classdef DualTensor
         if nargin == 3
             nR = varargin{1};
             nC = varargin{2};
-            obj(nR,nC) = DualMatrix; % <-- Updated line
+            obj(nR,nC) = DualMatrix; 
             for r = 1:nR
                 for c = 1:nC
                     obj(r,c).dArr = Dual2(1);
@@ -201,7 +161,6 @@ classdef DualTensor
                     error('The matrices for the real part and dual part must have same size');
                 end
                 [nR,nC,channels] = size(mat);
-                %obj.dArr = repmat(Dual2, nR, nC); % Preallocate dArr
                 obj(nR,nC,channels)=obj;
                 for ch = 1:channels
                     for r = 1:nR
@@ -272,8 +231,8 @@ classdef DualTensor
         end
         
         %-BEGIN ARITHMETIC OPERATIONS ----------------------------------------
-        % Aritmetic operations between two DualMatrix or between
-        % a DualMatrix and a double/Dual2
+        % Aritmetic operations between two DualTensor or between
+        % a DualTensor and a double/Dual2
         
         function dTen3 = plus(dTen1, dTen2) % element-wise addition
            
