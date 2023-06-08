@@ -61,26 +61,17 @@ function [w_conv, b_conv, w_fc, b_fc] = TrainCNN(mini_batch_x,...
            
            pred3 = Pool2x2(pred2);
            pred4 = Flattening(pred3);
-           pred4 = DualArray(pred4, ones(size(pred4)));
            pred5 = FC(pred4, w_fc, b_fc);  
-           pred5 = Sigmoid(pred5); 
-           grad_pred5 = getDual(pred5);
-           pred5 = getReal(pred5); 
            
            [l, dldy] = Loss_cross_entropy_softmax(pred5, y);
            loss(iIter) = loss(iIter)+l;
 
            % BACKWARD PASS
-           %[dldx_fc, dldw, dldb] = FC_backward(...
-           %    dldy, pred4, w_fc);
-           dldx_fc = (dldy * w_fc)' * 1;  % 1 corresponds to derivative of flatten layer 
-           pred4 = getReal(pred4); 
-           dldw = dldy' * pred4';
-           dldb = dldy;
+           [dldx_fc, dldw, dldb] = FC_backward(...
+               dldy, pred4, w_fc);
            
            [dldx_flat] = Flattening_backward(dldx_fc, pred3);
-           [dldx_pool] = Pool2x2_backward(dldx_flat, pred2);
-           %[dldx_sig] = Sigmoid_backward(dldx_pool, pred1);
+           [dldx_pool] = Pool2x2_backward(dldx_flat, pred2); % not used anymore
            dldx_sig = reshape(grad_pred2, [4,49, 3]);
            [dldw_conv, dldb_conv] = Conv_backward(dldx_sig, x, w_conv,...
                b_conv);
@@ -90,6 +81,9 @@ function [w_conv, b_conv, w_fc, b_fc] = TrainCNN(mini_batch_x,...
            
            dLdw_conv = dLdw_conv + reshape(dldw_conv, [f f c1 c2]);
            dLdb_conv = dLdb_conv + transpose(dldb_conv);
+
+           fprintf('Epoch #%d \ndLdw_conv for sample %d:\n', iIter, jImage);
+           disp(dLdw_conv);
         end
         
         w_conv = w_conv - gamma/currBatchSize*dLdw_conv;
